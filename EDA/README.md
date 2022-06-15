@@ -39,6 +39,19 @@ df_train.tail()
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -259,22 +272,6 @@ while we implement them in  model.*
 
 
 ```python
-corr_matrix = X.corr()
-corr_matrix = corr_matrix.stack().reset_index()
-corr_matrix.columns = ["varx", "vary", "corr"]
-plt.figure(figsize=(20,10))
-ax = sns.scatterplot(data=corr_matrix, x="varx", y="vary", hue="corr", palette="bwr", s=5)
-ax.set_title("Correlation Matrix");
-```
-
-### **Clustering using PCA**
-
-*As we can observe from the boxplots that our data have different scales we need to scale our data before implementing  
-Principal Component analysis. After Scaling data and implementing PCA we can observe that category 0 is  clustered at 
-the center while category 1 is clustered,  slightly right of the x-axis*
-
-
-```python
 from sklearn.preprocessing import StandardScaler
 
 scalar = StandardScaler()
@@ -283,6 +280,26 @@ X.columns = range(200)
 y = df_train["target"]
 df_scaled = scalar.fit_transform(X)
 ```
+
+
+```python
+corr_matrix = X.corr()
+corr_matrix = corr_matrix.stack().reset_index()
+corr_matrix.columns = ["varx", "vary", "corr"]
+plt.figure(figsize=(20,10))
+ax = sns.scatterplot(data=corr_matrix, x="varx", y="vary", hue="corr", palette="bwr", s=5)
+ax.set_title("Correlation Matrix");
+```
+
+
+![png](output_15_0.png)
+
+
+### **Clustering using PCA**
+
+*As we can observe from the boxplots that our data have different scales we need to scale our data before implementing  
+Principal Component analysis. After Scaling data and implementing PCA we can observe that category 0 is  clustered at 
+the center while category 1 is clustered,  slightly right of the x-axis*
 
 
 ```python
@@ -308,7 +325,7 @@ ax.set_ylabel("PCA2");
 
 *We implement logistic regression as our baseline model to understand how training and testing data behaves. After 
 implementing the LR regression model we conclude that our model overfits the data and poorly performs on the testing data 
-set. Now taking a cue from this model we will implement  more complex models to check if they improve on the test set*
+set. Now taking a cue from this model we will implement  more complex models to check if they improve onthe  test set*
 
 
 ```python
