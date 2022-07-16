@@ -42,8 +42,8 @@ import_data()
 
     Warning: Your Kaggle API key is readable by other users on this system! To fix this, you can run 'chmod 600 /home/nabeel/.kaggle/kaggle.json'
     Downloading creditcardfraud.zip to data
-    100%|██████████████████████████████████████| 66.0M/66.0M [00:18<00:00, 5.56MB/s]
-    100%|██████████████████████████████████████| 66.0M/66.0M [00:18<00:00, 3.68MB/s]
+    100%|██████████████████████████████████████| 66.0M/66.0M [00:18<00:00, 4.41MB/s]
+    100%|██████████████████████████████████████| 66.0M/66.0M [00:18<00:00, 3.64MB/s]
 
 
 ### **Importing Dataframe**
@@ -186,10 +186,10 @@ print("Reading and Writing in Pickle")
 ```
 
     Reading and Writing in Pickle
-    CPU times: user 3.06 ms, sys: 47.3 ms, total: 50.3 ms
-    Wall time: 49.1 ms
-    CPU times: user 6.24 ms, sys: 7.91 ms, total: 14.2 ms
-    Wall time: 13.7 ms
+    CPU times: user 0 ns, sys: 47.1 ms, total: 47.1 ms
+    Wall time: 45.9 ms
+    CPU times: user 2.43 ms, sys: 8.59 ms, total: 11 ms
+    Wall time: 9.92 ms
 
 
 
@@ -200,15 +200,25 @@ print("Reading and Writing in Feather")
 ```
 
     Reading and Writing in Feather
-    CPU times: user 244 ms, sys: 119 ms, total: 363 ms
-    Wall time: 669 ms
-    CPU times: user 175 ms, sys: 102 ms, total: 277 ms
-    Wall time: 1.11 s
+    CPU times: user 184 ms, sys: 39.8 ms, total: 224 ms
+    Wall time: 75.7 ms
+    CPU times: user 57.3 ms, sys: 52.7 ms, total: 110 ms
+    Wall time: 25.8 ms
 
 
+
+```python
 print("Reading and Writing in Parquet")
 %time df.to_parquet("data/df.parquet")
 %time df = pd.read_parquet("data/df.parquet")
+```
+
+    Reading and Writing in Parquet
+    CPU times: user 817 ms, sys: 45.1 ms, total: 862 ms
+    Wall time: 814 ms
+    CPU times: user 202 ms, sys: 93.7 ms, total: 295 ms
+    Wall time: 125 ms
+
 
 *Out of pickle, feather and parquet file format we find pickle to have the fastest read and and write speed and 
 we will prefer to use this format to import data for rest of the project work*
@@ -222,10 +232,10 @@ orignal csv file.We prefer to use pickle in our case becuase it is much faster i
 !ls -GFlash data/creditcard.csv data/df.pickle data/df.feather data/df.parquet
 ```
 
-    144M -rw-rw-r-- 1 nabeel 144M Jul 16 18:41 data/creditcard.csv
-     32M -rw-rw-r-- 1 nabeel  32M Jul 16 18:41 data/df.feather
-     49M -rw-rw-r-- 1 nabeel  49M Jul 16 18:41 data/df.parquet
-     34M -rw-rw-r-- 1 nabeel  34M Jul 16 18:41 data/df.pickle
+    144M -rw-rw-r-- 1 nabeel 144M Jul 16 21:07 data/creditcard.csv
+     32M -rw-rw-r-- 1 nabeel  32M Jul 16 21:07 data/df.feather
+     49M -rw-rw-r-- 1 nabeel  49M Jul 16 21:07 data/df.parquet
+     34M -rw-rw-r-- 1 nabeel  34M Jul 16 21:07 data/df.pickle
 
 
 ### **Train Test conversion**
