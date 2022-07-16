@@ -1,18 +1,19 @@
 ## **Data Processing**
 
-TABLE OF CONTENTS
+### **Table of Contents**
+1. Importing libraries
+2. Importing function
+3. Importing Dataframe
+4. Reducing Memory Usage
+5. Target Class proportion
+6. Train/Test split
+7. Conversion to different file formats
+8. Memory Usage
+9. Train Test conversion
 
-1. Importing essential libraries
-2. Importing Function
-3. Importing data from csv
-4. Function to convert data type
-5. Conversion to different file formats
-6. Memory Usage
-7. Test file conversion
-
-### **Importing essential libraries**
-
-*Importing essential libraries like os, zipfile,pandas aslo pyarrow (for feather and parquet)*
+### **Importing libraries**
+*Importing essential libraries like `os` for making directory, `zipfile` for extracting data from zip folder, `pandas` to process
+the dataframe and `pyarrow` for feather and parquet*
 
 
 ```python
@@ -22,15 +23,16 @@ import pandas as pd
 ```
 
 ### **Import Function**
+*Importing data from `Kaggle API`*
 
 
 ```python
-# function for importing data
 def import_data():
-    os.mkdir("data")
-    !kaggle competitions download -c santander-customer-transaction-prediction -p data/
-    with zipfile.ZipFile("data/santander-customer-transaction-prediction.zip", "r") as zipdata:
-        zipdata.extractall("data/")
+    if not os.path.exists("customer_transaction_prediction/"):
+        os.makedirs("data")
+        !kaggle datasets download -d mlg-ulb/creditcardfraud -p data/
+        with zipfile.ZipFile("data/creditcardfraud.zip", "r") as zipdata:
+            zipdata.extractall("data/")
 ```
 
 
@@ -39,203 +41,204 @@ import_data()
 ```
 
     Warning: Your Kaggle API key is readable by other users on this system! To fix this, you can run 'chmod 600 /home/nabeel/.kaggle/kaggle.json'
-    Downloading santander-customer-transaction-prediction.zip to data
-    100%|███████████████████████████████████████▉| 250M/250M [00:52<00:00, 5.67MB/s]
-    100%|████████████████████████████████████████| 250M/250M [00:52<00:00, 4.98MB/s]
+    Downloading creditcardfraud.zip to data
+    100%|██████████████████████████████████████| 66.0M/66.0M [00:18<00:00, 5.56MB/s]
+    100%|██████████████████████████████████████| 66.0M/66.0M [00:18<00:00, 3.68MB/s]
 
 
-### **Importing data from csv**
-
-*As we can observe the train dataframe takes 3880 miliseconds. The data type for integer value is in int64 and continuous values
-is in float64 format*
-
-
-```python
-%%time
-df_train = pd.read_csv("data/train.csv", index_col=False)
-```
-
-    CPU times: user 3.69 s, sys: 112 ms, total: 3.8 s
-    Wall time: 3.88 s
-
+### **Importing Dataframe**
+*The dataframe `df` consist of 29 attributes and 1 target class with 284,807 instances using 67.4 Mb of memory without null values*
 
 
 ```python
-df_train.info()
+df = pd.read_csv("data/creditcard.csv")
+df.info()
 ```
 
     <class 'pandas.core.frame.DataFrame'>
-    RangeIndex: 200000 entries, 0 to 199999
-    Columns: 202 entries, ID_code to var_199
-    dtypes: float64(200), int64(1), object(1)
-    memory usage: 308.2+ MB
+    RangeIndex: 284807 entries, 0 to 284806
+    Data columns (total 31 columns):
+     #   Column  Non-Null Count   Dtype  
+    ---  ------  --------------   -----  
+     0   Time    284807 non-null  float64
+     1   V1      284807 non-null  float64
+     2   V2      284807 non-null  float64
+     3   V3      284807 non-null  float64
+     4   V4      284807 non-null  float64
+     5   V5      284807 non-null  float64
+     6   V6      284807 non-null  float64
+     7   V7      284807 non-null  float64
+     8   V8      284807 non-null  float64
+     9   V9      284807 non-null  float64
+     10  V10     284807 non-null  float64
+     11  V11     284807 non-null  float64
+     12  V12     284807 non-null  float64
+     13  V13     284807 non-null  float64
+     14  V14     284807 non-null  float64
+     15  V15     284807 non-null  float64
+     16  V16     284807 non-null  float64
+     17  V17     284807 non-null  float64
+     18  V18     284807 non-null  float64
+     19  V19     284807 non-null  float64
+     20  V20     284807 non-null  float64
+     21  V21     284807 non-null  float64
+     22  V22     284807 non-null  float64
+     23  V23     284807 non-null  float64
+     24  V24     284807 non-null  float64
+     25  V25     284807 non-null  float64
+     26  V26     284807 non-null  float64
+     27  V27     284807 non-null  float64
+     28  V28     284807 non-null  float64
+     29  Amount  284807 non-null  float64
+     30  Class   284807 non-null  int64  
+    dtypes: float64(30), int64(1)
+    memory usage: 67.4 MB
 
+
+### **Reducing Memory Usage**
+*Reducing the size of the dataset without significantly effecting the precision of sample values. 
+Converting the target class to `int16` and column variables to `float32` data type.* 
 
 
 ```python
-df_train.dtypes
-```
-
-
-
-
-    ID_code     object
-    target       int64
-    var_0      float64
-    var_1      float64
-    var_2      float64
-                ...   
-    var_195    float64
-    var_196    float64
-    var_197    float64
-    var_198    float64
-    var_199    float64
-    Length: 202, dtype: object
-
-
-
-### **Function to convert data type**
-
-*This function converts the int64 into int16 and float64 to float32 format without disturbing the precision, it also drops
-unneccesary columns in order to preserve the memory*
-
-
-```python
-# changing the datatype to save memory space
-def d2d(df, drop):
-    df = df.drop(columns=drop)
-    dict_dtypes = dict(df.dtypes) 
-    for col,dtype in dict_dtypes.items():
-        if dtype == "int64":
-            df[col] = df[col].astype("int16")
-        elif dtype == "float64":
+# reducing the size of dataset without effecting the precision of sample values
+def reduce(df):
+    dict_dtypes = dict(df.dtypes)
+    for col, dtype in dict_dtypes.items():
+        if dtype == "float64":
             df[col] = df[col].astype("float32")
+        elif dtype == "int64":
+            df[col] = df[col].astype("int16")
         else:
             pass
     return df
 ```
 
-*It took 3420 milliseconds to convert the entire dataset to the given format with almost cutting  the memory requirement 
-in half from initial state*
-
 
 ```python
-%%time
-df_train = d2d(df_train, ['ID_code'])
+reduced_df = reduce(df)
 ```
 
-    CPU times: user 6.48 s, sys: 26.4 s, total: 32.9 s
-    Wall time: 34.2 s
-
-
-
-```python
-df_train.info()
-```
-
-    <class 'pandas.core.frame.DataFrame'>
-    RangeIndex: 200000 entries, 0 to 199999
-    Columns: 201 entries, target to var_199
-    dtypes: float32(200), int16(1)
-    memory usage: 153.0 MB
-
+### **Target Class proportion**
+*Majority of instances are non fradulent in nature, just 1.7% of instances consist of fradulent payment.*
 
 
 ```python
-df_train.dtypes
+# find the weight of each class
+df["Class"].value_counts()/len(df)
 ```
 
 
 
 
-    target       int16
-    var_0      float32
-    var_1      float32
-    var_2      float32
-    var_3      float32
-                ...   
-    var_195    float32
-    var_196    float32
-    var_197    float32
-    var_198    float32
-    var_199    float32
-    Length: 201, dtype: object
+    0    0.998273
+    1    0.001727
+    Name: Class, dtype: float64
 
 
 
-### **Conversion to different file formats** 
+### **Train/Test Split**
+*Splitting the dataframe into train and test sets using stratified sampling which preserves the proportion of target class.
+Keeping 25% of instances for test and rest for training.*
 
+
+```python
+# split the data into training and testing sets using stratified fold
+from sklearn.model_selection import train_test_split
+xtrain, xtest, ytrain, ytest = train_test_split(reduced_df.iloc[:, :-1], 
+                                                reduced_df["Class"],
+                                                stratify=reduced_df["Class"],
+                                                test_size=0.25,
+                                                random_state=123)
+
+```
+
+
+```python
+train = pd.concat([xtrain, ytrain], axis=1)
+train = train.reset_index(drop=True)
+test = pd.concat([xtest, ytest], axis=1)
+test = test.reset_index(drop=True)
+```
+
+
+```python
+# target class proportions are preserved
+print("train set proportions: ")
+print(train["Class"].value_counts()/len(train))
+```
+
+    train set proportions: 
+    0    0.998273
+    1    0.001727
+    Name: Class, dtype: float64
+
+
+### **Conversion to different file formats**
 *We convert our processed data to three different file formats to compare there conversion speed and there read speed in order 
 to get the file format which is faster to read and write*
 
 
 ```python
-print('Reading and Writing CSV')
-%time df_train.to_pickle("data/train.pickle")
-%time df_train = pd.read_pickle("data/train.pickle")
+print("Reading and Writing in Pickle")
+%time df.to_pickle("data/df.pickle")
+%time df = pd.read_pickle("data/df.pickle")
 ```
 
-    Reading and Writing CSV
-    CPU times: user 3.58 ms, sys: 130 ms, total: 134 ms
-    Wall time: 157 ms
-    CPU times: user 5.2 ms, sys: 29.2 ms, total: 34.4 ms
-    Wall time: 34 ms
+    Reading and Writing in Pickle
+    CPU times: user 3.06 ms, sys: 47.3 ms, total: 50.3 ms
+    Wall time: 49.1 ms
+    CPU times: user 6.24 ms, sys: 7.91 ms, total: 14.2 ms
+    Wall time: 13.7 ms
 
 
 
 ```python
-print('Reading and Writing Feather')
-%time df_train.to_feather("data/train.feather")
-%time df_train = pd.read_feather("data/train.feather")
+print("Reading and Writing in Feather")
+%time df.to_feather("data/df.feather")
+%time df = pd.read_feather("data/df.feather")
 ```
 
-    Reading and Writing Feather
-    CPU times: user 724 ms, sys: 185 ms, total: 909 ms
-    Wall time: 1.05 s
-    CPU times: user 477 ms, sys: 248 ms, total: 725 ms
-    Wall time: 1.07 s
+    Reading and Writing in Feather
+    CPU times: user 244 ms, sys: 119 ms, total: 363 ms
+    Wall time: 669 ms
+    CPU times: user 175 ms, sys: 102 ms, total: 277 ms
+    Wall time: 1.11 s
 
 
-
-```python
-print('Reading and Writing Parquet')
-%time df_train.to_parquet("data/train.parquet")
-%time df_train = pd.read_parquet("data/train.parquet")
-```
-
-    Reading and Writing Parquet
-    CPU times: user 2.65 s, sys: 136 ms, total: 2.78 s
-    Wall time: 2.67 s
-    CPU times: user 552 ms, sys: 394 ms, total: 946 ms
-    Wall time: 5.38 s
-
+print("Reading and Writing in Parquet")
+%time df.to_parquet("data/df.parquet")
+%time df = pd.read_parquet("data/df.parquet")
 
 *Out of pickle, feather and parquet file format we find pickle to have the fastest read and and write speed and 
 we will prefer to use this format to import data for rest of the project work*
 
-### **Memory Usage**
-
-*Out of the three file formats pickle and feather use the least memory but since the speed of read and write of pickle file 
-is much faster than other file format in our case we will prefer to use it*
+### **Memory usage**
+*Out of the three file formats pickle and feather use the least memory, almost reducing the size of data four times than that of
+orignal csv file.We prefer to use pickle in our case becuase it is much faster in read and write speeds than other file formats*
 
 
 ```python
-!ls -GFlash data/train.csv data/train.pickle data/train.feather data/train.parquet
+!ls -GFlash data/creditcard.csv data/df.pickle data/df.feather data/df.parquet
 ```
 
-    289M -rw-rw-r-- 1 nabeel 289M Jun 12 16:14 data/train.csv
-    153M -rw-rw-r-- 1 nabeel 153M Jun 12 16:15 data/train.feather
-    156M -rw-rw-r-- 1 nabeel 156M Jun 12 16:15 data/train.parquet
-    153M -rw-rw-r-- 1 nabeel 153M Jun 12 16:15 data/train.pickle
+    144M -rw-rw-r-- 1 nabeel 144M Jul 16 18:41 data/creditcard.csv
+     32M -rw-rw-r-- 1 nabeel  32M Jul 16 18:41 data/df.feather
+     49M -rw-rw-r-- 1 nabeel  49M Jul 16 18:41 data/df.parquet
+     34M -rw-rw-r-- 1 nabeel  34M Jul 16 18:41 data/df.pickle
 
 
-### **Test file conversion**
+### **Train Test conversion**
 
 
 ```python
-df_test = pd.read_csv("data/test.csv")
-df_test = d2d(df_test, ["ID_code"])
-df_test.to_pickle("data/test.pickle")
+train.to_pickle("data/train.pickle")
+test.to_pickle("data/test.pickle")
+```
+
+
+```python
+
 ```
 
 
