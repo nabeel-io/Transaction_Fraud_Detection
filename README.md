@@ -22,6 +22,10 @@
 |**LightGBM**|[*main*](https://github.com/nabeel-io/customer_transaction_prediction/tree/main/LightGBM)|[*notebook*](LightGBM/LightGBM.ipynb)|
 |**Stacking_Voting**|[*main*](https://github.com/nabeel-io/customer_transaction_prediction/tree/main/Stacking_Voting)|[*notebook*](Stacking_Voting/Stacking_Blending.ipynb)|
 
+### **Feature Distribution**
+![distribution](EDA/output_14_0.png)
+
+
 
 ### **Results**
 ![RFC](RandomForest/output_26_1.png)
