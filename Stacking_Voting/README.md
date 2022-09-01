@@ -148,8 +148,6 @@ logit = LogisticRegression()
 logit.fit(train_probability, train["Class"])
 ```
 
-
-
 ```python
 test_pred = logit.predict(test_probability)
 ```
